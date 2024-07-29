@@ -5,11 +5,16 @@
 
 # Используемые в Docker образы 
 
-| Образ                    | Версия |  Контейнер  |
-|--------------------------|--------|-------------|
-| `keycloak/keycloak`      | latest |  keycloak   |
-| `postgres`               | latest |  postgres_k |
+| Образ                        | Версия |  Контейнер  |
+|------------------------------|--------|-------------|
+| `quay.io/keycloak/keycloak`  | latest |  keycloak   |
+| `postgres`                   | latest |  postgres_k |
+ 
+# Как загрузить quay.io/keycloak/keycloak
+
+- docker pull quay.io/keycloak/keycloak
 
 # История изменений
 
 - `24.07.2024` **Первичная фиксация проекта**
+- `29.07.2024` **Добавление модулей для Keycloak, изменение настроек**

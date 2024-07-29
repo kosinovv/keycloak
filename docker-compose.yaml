@@ -1,0 +1,75 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kosinov_keycloak
+    ports:
+      - 8080:8080
+    depends_on:
+      - redis
+      - postgres_k
+      - keycloak
+    environment:
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres_k:5432/postgres'
+      - 'SPRING_DATASOURCE_USERNAME=postgres'
+      - 'SPRING_DATASOURCE_PASSWORD=postgres'
+      - 'SPRING_DATA_REDIS_HOST=redis'
+      - 'SPRING_DATA_REDIS_PORT=6379'
+      - 'KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth'
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    container_name: keycloak
+    command:
+      - start
+      - --hostname=localhost
+      - --http-enabled=true
+      - --import-realm
+    environment:
+      KC_FEATURES: preview
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB_URL: jdbc:postgresql://postgres_k:5432/postgres
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_DB_SCHEMA: public
+    ports:
+      - 8081:8080
+    depends_on:
+      postgres_k:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://0.0.0.0:8080/realms/master" ]
+      start_period: 10s
+      interval: 30s
+      retries: 3
+      timeout: 5s
+  postgres_k:
+    image: postgres
+    container_name: postgres_k
+    ports:
+      - 5432:5432
+    environment:
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_DB=postgres'
+    healthcheck:
+      test: pg_isready -d postgres
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 2s
+      retries: 10
+
+volumes:
+  postgres-data:
