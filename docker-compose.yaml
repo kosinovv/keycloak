@@ -3,10 +3,10 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: DockerfileApp
     container_name: kosinov_keycloak
     ports:
-      - 8080:8080
+      - 8081:8081
     depends_on:
       - redis
       - postgres_k
@@ -19,13 +19,16 @@ services:
       - 'SPRING_DATA_REDIS_PORT=6379'
       - 'KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080/auth'
   keycloak:
-    image: quay.io/keycloak/keycloak
+    build:
+      context: .
+      dockerfile: DockerfileKeycloak
     container_name: keycloak
     command:
       - start
-      - --hostname=localhost
       - --http-enabled=true
+      - --health-enabled=true
       - --import-realm
+      - --db=postgres
     environment:
       KC_FEATURES: preview
       KEYCLOAK_ADMIN: admin
@@ -35,7 +38,7 @@ services:
       KC_DB_PASSWORD: postgres
       KC_DB_SCHEMA: public
     ports:
-      - 8081:8080
+      - 8080:8080
     depends_on:
       postgres_k:
         condition: service_healthy
