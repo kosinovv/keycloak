@@ -1,4 +1,4 @@
-<h1 align="center">Курсовая работа - Сервис аутентификации на KeyCloak</h1>
+<h1 style="text-align: center;">Курсовая работа - Сервис аутентификации на KeyCloak</h1>
 Разработчик: Косинов Виктор, версия: 1.1
 
 Приложение демонстрирует работу IDM KeyCloak
@@ -16,11 +16,17 @@
 
 # Что необходимо сделать для запуска приложения
 
-- импортировать realm в Keycloak из файла src/main/resources/keycloak/kosinov-keycloak-realm.json
+- запустить docker-compose.yaml и проверить, что в Docker поднялся контейнер kosinov-keycloak и в нем образы keycloak и postgres_k
+- авторизоваться под admin/admin на сервисе Keycloak http://localhost:8080
+- создать новый realm и импортировать из файла src/main/resources/keycloak/kosinov-keycloak-realm.json
 - завести административного пользователя в realm Kosinov Keycloak с ролью ADMIN, либо включить в группу Administrators
-- запустить docker-compose.yaml
+- запустить приложение KosinovKeycloakApplication.java
 - в браузере открыть адрес http://localhost:8081
 - авторизоваться с административной учеткой realm Kosinov Keycloak
+- проверить функционал приложения:
+  - ограничение доступа к страницам согласно ролям ADMIN и USER
+  - создание нового пользователя под пользователем с ролью администратора
+  - изменение собственного пользователя для всех авторизованных пользователей
 
 # История изменений
 
