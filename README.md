@@ -19,6 +19,7 @@
 - импортировать realm в Keycloak из файла src/main/resources/keycloak/kosinov-keycloak-realm.json
 - завести административного пользователя в realm Kosinov Keycloak с ролью ADMIN, либо включить в группу Administrators
 - запустить docker-compose.yaml
+- запустить приложение KosinovKeycloakApplication.java
 - в браузере открыть адрес http://localhost:8081
 - авторизоваться с административной учеткой realm Kosinov Keycloak
 
