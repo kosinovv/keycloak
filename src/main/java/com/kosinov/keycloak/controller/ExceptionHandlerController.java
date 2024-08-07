@@ -4,7 +4,9 @@ import com.kosinov.keycloak.dto.ErrorResponse;
 import com.kosinov.keycloak.exception.UserNotFound;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import static com.kosinov.keycloak.model.InternalErrorStatus.USER_NOT_FOUND;

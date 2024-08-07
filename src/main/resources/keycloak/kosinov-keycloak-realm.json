@@ -109,26 +109,8 @@
     "client": {
       "kosinov-keycloak-client": [
         {
-          "id": "a98ed6e4-05fc-4c8f-8af5-c9b46aca9343",
-          "name": "USER",
-          "description": "",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "264609c1-6bcb-4b35-905c-3c0c0e9d78c1",
-          "attributes": {}
-        },
-        {
           "id": "9ef2fbcc-cd8c-4adc-88d6-e20e50822ba0",
           "name": "uma_protection",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "264609c1-6bcb-4b35-905c-3c0c0e9d78c1",
-          "attributes": {}
-        },
-        {
-          "id": "64f5e374-f896-4b74-acb5-d34233324165",
-          "name": "ADMIN",
-          "description": "",
           "composite": false,
           "clientRole": true,
           "containerId": "264609c1-6bcb-4b35-905c-3c0c0e9d78c1",
@@ -525,6 +507,36 @@
   "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": false,
   "webAuthnPolicyPasswordlessAcceptableAaguids": [],
   "webAuthnPolicyPasswordlessExtraOrigins": [],
+  "users": [
+    {
+      "id": "43d2bb99-aef4-4e92-bfdc-3fcd864c8fc6",
+      "username": "service-account-kosinov-keycloak-client",
+      "emailVerified": false,
+      "createdTimestamp": 1722975301604,
+      "enabled": true,
+      "totp": false,
+      "serviceAccountClientId": "kosinov-keycloak-client",
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-kosinov-keycloak-realm"
+      ],
+      "clientRoles": {
+        "realm-management": [
+          "view-users",
+          "manage-users",
+          "view-realm",
+          "view-clients",
+          "manage-realm"
+        ],
+        "kosinov-keycloak-client": [
+          "uma_protection"
+        ]
+      },
+      "notBefore": 0,
+      "groups": []
+    }
+  ],
   "scopeMappings": [
     {
       "clientScope": "offline_access",
@@ -740,6 +752,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
+      "secret": "SEuB33S9GZa1DVlW8mFD9vUhQn1hXBj9",
       "redirectUris": [
         "http://localhost:8081/*"
       ],
@@ -752,13 +765,14 @@
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "publicClient": false,
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
         "oidc.ciba.grant.enabled": "false",
-        "client.secret.creation.time": "1722933557",
+        "client.secret.creation.time": "1722975317",
         "backchannel.logout.session.required": "true",
         "post.logout.redirect.uris": "http://localhost:8081/*",
         "display.on.consent.screen": "false",
@@ -829,7 +843,47 @@
         "phone",
         "offline_access",
         "organization"
-      ]
+      ],
+      "authorizationSettings": {
+        "allowRemoteResourceManagement": true,
+        "policyEnforcementMode": "ENFORCING",
+        "resources": [
+          {
+            "name": "Default Resource",
+            "type": "urn:kosinov-keycloak-client:resources:default",
+            "ownerManagedAccess": false,
+            "attributes": {},
+            "uris": [
+              "/*"
+            ]
+          }
+        ],
+        "policies": [
+          {
+            "name": "Default Policy",
+            "description": "A policy that grants access only for users within this realm",
+            "type": "js",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "code": "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
+            }
+          },
+          {
+            "name": "Default Permission",
+            "description": "A permission that applies to the default resource type",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "defaultResourceType": "urn:kosinov-keycloak-client:resources:default",
+              "applyPolicies": "[\"Default Policy\"]"
+            }
+          }
+        ],
+        "scopes": [],
+        "decisionStrategy": "UNANIMOUS"
+      }
     },
     {
       "id": "0df94795-67fe-4efa-9098-3d5853ec19c9",

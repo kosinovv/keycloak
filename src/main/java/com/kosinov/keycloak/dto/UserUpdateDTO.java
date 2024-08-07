@@ -1,18 +1,10 @@
 package com.kosinov.keycloak.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.sql.Date;
-
-@Getter
-@Setter
+@Data
 public class UserUpdateDTO {
-
-    private String userName; //Код пользователя
-
-    private String longName; //Длинное имя пользователя
-
-    private Date correctDate; //Дата создания/коррекции
-
+    private String username;
+    private String password;
+    private String role;
 }

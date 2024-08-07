@@ -1,71 +1,66 @@
 package com.kosinov.keycloak.service;
 
-import com.kosinov.keycloak.exception.UserNotFound;
-import com.kosinov.keycloak.dto.UserUpdateDTO;
-import com.kosinov.keycloak.model.User;
-import com.kosinov.keycloak.dto.UserDTO;
-import com.kosinov.keycloak.repository.UserCachedRepository;
-import com.kosinov.keycloak.repository.UserRepository;
-import com.kosinov.keycloak.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import java.util.Collections;
+import java.util.List;
 
-import java.util.Optional;
+import com.kosinov.keycloak.dto.UserDTO;
+import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleMappingResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class KKService {
 
-    //Раздел сотрудников
+    private final Keycloak keycloak;
 
-    private final UserRepository userRepository;
-    private final UserCachedRepository userCachedRepository;
-    private final UserMapper userMapper;
+    @Value("${spring.keycloak.realm}")
+    private String realm;
 
-    public UserDTO addUser(UserDTO userDTO) {
-        User user = new User(
-                userDTO.getUserName(),
-                userDTO.getLongName(),
-                userDTO.getCorrectDate());
-        userRepository.save(user);
-        return userDTO;
-    }
-
-    public User getUser(String userName) {
-        return findInCacheOrDbByUserName(userName);
-    }
-
-    public UserDTO findUser(String userName) {
-        User findedUser = findInCacheOrDbByUserName(userName);
-        return userMapper.toDto(findedUser);
-    }
-
-    public UserDTO deleteUser(String userName) {
-        User userForDelete = findInCacheOrDbByUserName(userName);
-        userRepository.deleteById(userForDelete.getId());
-        return userMapper.toDto(userForDelete);
-    }
-
-    public UserDTO updateEmployee(UserUpdateDTO userUpdateDTO) {
-        User userForUpdate = findInCacheOrDbByUserName(userUpdateDTO.getUserName());
-        userMapper.update(userUpdateDTO, userForUpdate);
-        userRepository.save(userForUpdate);
-        return userMapper.toDto(userForUpdate);
-    }
-
-    private User findInCacheOrDbByUserName(String userName) {
-        Optional<User> userFromCache = userCachedRepository.findByUserName(userName);
-
-        if (userFromCache.isPresent()) {
-            return userFromCache.get();
+    public void addUser(UserDTO dto) {
+        String username = dto.getUsername();
+        CredentialRepresentation credential = createPasswordCredentials(dto.getPassword());
+        UserRepresentation user = new UserRepresentation();
+        user.setUsername(username);
+        user.setCredentials(Collections.singletonList(credential));
+        user.setEnabled(true);
+        UsersResource usersResource = getUsersResource();
+        Response response = usersResource.create(user);
+        if (response.getStatus() == 201) {
+            addRealmRoleToUser(username, dto.getRole());
         }
-
-        User userFromDb = userRepository.findByUserName(userName);
-        if (userFromDb == null) {
-            throw new UserNotFound(String.format("Пользователь %s не найден", userName));
-        }
-
-        userCachedRepository.save(userFromDb);
-        return userFromDb;
+        org.keycloak.admin.client.CreatedResponseUtil.getCreatedId(response);
     }
+
+    private void addRealmRoleToUser(String userName, String roleName) {
+        RealmResource realmResource = keycloak.realm(realm);
+        List<UserRepresentation> users = realmResource.users().search(userName);
+        UserResource userResource = realmResource.users().get(users.get(0).getId());
+        RoleRepresentation role = realmResource.roles().get(roleName).toRepresentation();
+        RoleMappingResource roleMappingResource = userResource.roles();
+        roleMappingResource.realmLevel().add(Collections.singletonList(role));
+    }
+
+    private UsersResource getUsersResource() {
+        keycloak.tokenManager().getAccessToken();
+        return keycloak.realm(realm).users();
+    }
+
+    private static CredentialRepresentation createPasswordCredentials(String password) {
+        CredentialRepresentation passwordCredentials = new CredentialRepresentation();
+        passwordCredentials.setTemporary(false);
+        passwordCredentials.setType(CredentialRepresentation.PASSWORD);
+        passwordCredentials.setValue(password);
+        return passwordCredentials;
+    }
+
 }
