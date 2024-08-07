@@ -1,5 +1,6 @@
 package com.kosinov.keycloak.controller;
 
+import com.kosinov.keycloak.dto.PasswordDTO;
 import com.kosinov.keycloak.dto.UserDTO;
 import com.kosinov.keycloak.service.KKService;
 import jakarta.annotation.security.RolesAllowed;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class KKController {
 
     private final KKService kkService;
+    private String curUserName;
 
     @GetMapping("/admin")
     @RolesAllowed("ADMIN")
@@ -32,7 +34,8 @@ public class KKController {
 
     @GetMapping("/create")
     @RolesAllowed("ADMIN")
-    public String createUser() {
+    public String createUser(Principal principal, Model model) {
+        model.addAttribute("username", principal.getName());
         return "create-user";
     }
 
@@ -43,4 +46,18 @@ public class KKController {
         return "index";
     }
 
+
+    @GetMapping("/changePassword")
+    public String changePassword(Principal principal, Model model) {
+        curUserName = principal.getName();
+        model.addAttribute("username", principal.getName());
+        return "change-password";
+    }
+
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestBody PasswordDTO passwordDTO) {
+        passwordDTO.setUserName(curUserName);
+        kkService.changePassword(passwordDTO);
+        return "index";
+    }
 }

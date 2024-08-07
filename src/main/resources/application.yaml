@@ -8,8 +8,6 @@ spring:
     realm: kosinov-keycloak-realm
     resource: kosinov-keycloak-client
     public-client: true
-#    username: admin
-#    password: admin
   security:
     oauth2:
       client:

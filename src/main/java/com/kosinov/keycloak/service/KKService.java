@@ -1,8 +1,11 @@
 package com.kosinov.keycloak.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import com.kosinov.keycloak.dto.PasswordDTO;
 import com.kosinov.keycloak.dto.UserDTO;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +29,19 @@ public class KKService {
     @Value("${spring.keycloak.realm}")
     private String realm;
 
-    public void addUser(UserDTO dto) {
-        String username = dto.getUsername();
-        CredentialRepresentation credential = createPasswordCredentials(dto.getPassword());
+    public void addUser(UserDTO userDTO) {
+        CredentialRepresentation credential = createPasswordCredentials(userDTO.getPassword());
         UserRepresentation user = new UserRepresentation();
-        user.setUsername(username);
+        user.setUsername(userDTO.getUserName());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
         user.setCredentials(Collections.singletonList(credential));
         user.setEnabled(true);
         UsersResource usersResource = getUsersResource();
         Response response = usersResource.create(user);
         if (response.getStatus() == 201) {
-            addRealmRoleToUser(username, dto.getRole());
+            addRealmRoleToUser(userDTO.getUserName(), userDTO.getRole());
         }
         org.keycloak.admin.client.CreatedResponseUtil.getCreatedId(response);
     }
@@ -61,6 +66,14 @@ public class KKService {
         passwordCredentials.setType(CredentialRepresentation.PASSWORD);
         passwordCredentials.setValue(password);
         return passwordCredentials;
+    }
+
+    public void changePassword(PasswordDTO passwordDTO) {
+        RealmResource realmResource = keycloak.realm(realm);
+        List<UserRepresentation> users = realmResource.users().search(passwordDTO.getUserName());
+        UserResource userResource = realmResource.users().get(users.get(0).getId());
+        CredentialRepresentation credential = createPasswordCredentials(passwordDTO.getPassword());
+        userResource.resetPassword(credential);
     }
 
 }

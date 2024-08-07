@@ -4,13 +4,34 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keycloak Spring Boot Integration</title>
+    <title>Интеграция Keycloak и Spring Boot</title>
 </head>
 <body>
 <h1>Kosinov Keycloak</h1>
-<p><a th:href="@{/admin}">Admin Page</a></p>
-<p><a th:href="@{/user}">User Page</a></p>
-<p><a th:href="@{/create}">Create User</a></p>
-<p><a th:href="@{/logout}">Logout</a></p>
+<p>
+    <a href="admin.html" th:href="@{/admin}">
+        <button>Страница, доступная только администраторам</button>
+    </a>
+</p>
+<p>
+    <a href="user.html" th:href="@{/user}">
+        <button>Страница, доступная всем пользователям</button>
+    </a>
+</p>
+<p>
+    <a href="create-user.html" th:href="@{/create}">
+        <button>Создать пользователя</button>
+    </a>
+</p>
+<p>
+    <a href="change-password.html" th:href="@{/changePassword}">
+        <button>Изменить пароль</button>
+    </a>
+</p>
+<p>
+    <a href="" th:href="@{/logout}">
+        <button>Выход</button>
+    </a>
+</p>
 </body>
 </html>

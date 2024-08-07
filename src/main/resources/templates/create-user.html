@@ -4,27 +4,45 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create user</title>
+  <title>Создание пользователя</title>
 </head>
 <body>
 <form id="userForm" th:action="@{/create}" method="post">
-  <label for="username">Username:</label>
+  <label for="username">Логин:</label>
   <input type="text" id="username" name="username" required>
   <br>
-  <label for="password">Password:</label>
+  <br>
+  <label for="role">Фамилия:</label>
+  <input type="text" id="firstname" name="firstname" required>
+  <br>
+  <br>
+  <label for="role">Имя:</label>
+  <input type="text" id="lastname" name="lastname" required>
+  <br>
+  <br>
+  <label for="role">email:</label>
+  <input type="text" id="email" name="email" required>
+  <br>
+  <br>
+  <label for="password">Пароль:</label>
   <input type="password" id="password" name="password" required>
   <br>
-  <label for="role">Role:</label>
+  <br>
+  <label for="role">Роль:</label>
   <input type="text" id="role" name="role" required>
   <br>
-  <button type="button" onclick="submitForm()">Create User</button>
+  <br>
+  <button type="button" onclick="submitForm()">Создать пользователя</button>
 </form>
 <script>
   function submitForm() {
     var form = document.getElementById('userForm');
     var formData = {
-      username: form.elements.username.value,
+      userName: form.elements.username.value,
       password: form.elements.password.value,
+      firstName: form.elements.firstname.value,
+      lastName: form.elements.lastname.value,
+      email: form.elements.email.value,
       role: form.elements.role.value
     };
     var jsonData = JSON.stringify(formData);
@@ -37,6 +55,8 @@
     });
   }
 </script>
-<p><a th:href="@{/}">Return to Home Page</a></p>
+<p><a href="index.html" th:href="@{~/}">
+  <button>Назад</button>
+</a></p>
 </body>
 </html>
