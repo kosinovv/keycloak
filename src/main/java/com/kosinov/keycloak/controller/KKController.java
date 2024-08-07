@@ -2,6 +2,7 @@ package com.kosinov.keycloak.controller;
 
 import com.kosinov.keycloak.dto.PasswordDTO;
 import com.kosinov.keycloak.dto.UserDTO;
+import com.kosinov.keycloak.dto.UserDeleteDTO;
 import com.kosinov.keycloak.service.KKService;
 import jakarta.annotation.security.RolesAllowed;
 import java.security.Principal;
@@ -46,6 +47,18 @@ public class KKController {
         return "index";
     }
 
+    @GetMapping("/delete")
+    @RolesAllowed("ADMIN")
+    public String deleteUser() {
+        return "delete-user";
+    }
+
+    @PostMapping("/delete")
+    @RolesAllowed("ADMIN")
+    public String deleteUser(@RequestBody UserDeleteDTO userDeleteDTO) {
+        kkService.deleteUser(userDeleteDTO);
+        return "index";
+    }
 
     @GetMapping("/changePassword")
     public String changePassword(Principal principal, Model model) {

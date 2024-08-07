@@ -1,12 +1,11 @@
 package com.kosinov.keycloak.service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import com.kosinov.keycloak.dto.PasswordDTO;
 import com.kosinov.keycloak.dto.UserDTO;
+import com.kosinov.keycloak.dto.UserDeleteDTO;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
@@ -74,6 +73,13 @@ public class KKService {
         UserResource userResource = realmResource.users().get(users.get(0).getId());
         CredentialRepresentation credential = createPasswordCredentials(passwordDTO.getPassword());
         userResource.resetPassword(credential);
+    }
+
+    public void deleteUser(UserDeleteDTO userDeleteDTO) {
+        RealmResource realmResource = keycloak.realm(realm);
+        List<UserRepresentation> users = realmResource.users().search(userDeleteDTO.getUserName());
+        UserResource userResource = realmResource.users().get(users.get(0).getId());
+        userResource.remove();
     }
 
 }
