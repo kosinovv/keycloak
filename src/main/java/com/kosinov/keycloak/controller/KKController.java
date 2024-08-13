@@ -31,7 +31,7 @@ public class KKController {
 
     @GetMapping("/create")
     @RolesAllowed("ADMIN")
-    public String createUser(Principal principal, Model model) {
+    public String createUser(Model model) {
         model.addAttribute("userDTO", new UserDTO());
         return "create-user";
     }
@@ -62,8 +62,8 @@ public class KKController {
 
     @GetMapping("/changePassword")
     public String changePassword(Principal principal, Model model) {
-        model.addAttribute("username", principal.getName());
-        model.addAttribute("userDTO", new UserDTO());
+        UserDTO user = kkService.findUser(principal.getName());
+        model.addAttribute("userDTO", user);
         return "change-password";
     }
 
