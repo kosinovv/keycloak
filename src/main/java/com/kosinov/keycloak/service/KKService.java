@@ -1,11 +1,10 @@
 package com.kosinov.keycloak.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.kosinov.keycloak.dto.PasswordDTO;
 import com.kosinov.keycloak.dto.UserDTO;
-import com.kosinov.keycloak.dto.UserDeleteDTO;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
@@ -67,19 +66,55 @@ public class KKService {
         return passwordCredentials;
     }
 
-    public void changePassword(PasswordDTO passwordDTO) {
+    public void changePassword(UserDTO userDTO) {
         RealmResource realmResource = keycloak.realm(realm);
-        List<UserRepresentation> users = realmResource.users().search(passwordDTO.getUserName());
+        List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
         UserResource userResource = realmResource.users().get(users.get(0).getId());
-        CredentialRepresentation credential = createPasswordCredentials(passwordDTO.getPassword());
+        CredentialRepresentation credential = createPasswordCredentials(userDTO.getPassword());
         userResource.resetPassword(credential);
     }
 
-    public void deleteUser(UserDeleteDTO userDeleteDTO) {
+    public void deleteUser(UserDTO userDTO) {
         RealmResource realmResource = keycloak.realm(realm);
-        List<UserRepresentation> users = realmResource.users().search(userDeleteDTO.getUserName());
+        List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
         UserResource userResource = realmResource.users().get(users.get(0).getId());
         userResource.remove();
+    }
+
+    public List<String> listUser() {
+        RealmResource realmResource = keycloak.realm(realm);
+        List<UserRepresentation> users = realmResource.users().list();
+        List<String> usersList = new ArrayList<>();
+        for(UserRepresentation user : users){
+            usersList.add(user.getUsername());
+        }
+        return usersList;
+    }
+
+    public UserDTO findUser(String userName) {
+        RealmResource realmResource = keycloak.realm(realm);
+        List<UserRepresentation> users = realmResource.users().search(userName);
+        UserDTO user = new UserDTO();
+        user.setUserName(users.get(0).getUsername());
+        user.setFirstName(users.get(0).getFirstName());
+        user.setLastName(users.get(0).getLastName());
+        user.setEmail(users.get(0).getEmail());
+        return user;
+    }
+
+    public void saveUser(UserDTO userDTO) {
+      try {
+        RealmResource realmResource = keycloak.realm(realm);
+        List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
+        UserResource userResource = realmResource.users().get(users.get(0).getId());
+        UserRepresentation user = userResource.toRepresentation();
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        userResource.update(user);
+      } catch (Exception exception) {
+        exception.printStackTrace();
+      }
     }
 
 }
