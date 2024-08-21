@@ -6,6 +6,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.security.Principal;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class KKController {
 
+    @Autowired
     private final KKService kkService;
 
     @GetMapping("/admin")

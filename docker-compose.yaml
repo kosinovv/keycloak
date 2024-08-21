@@ -20,12 +20,13 @@ services:
       dockerfile: DockerfileKeycloak
     container_name: keycloak
     command:
-      - start
+      - start-dev
       - --http-enabled=true
       - --health-enabled=true
       - --import-realm
       - --db=postgres
     environment:
+      KC_HOSTNAME: localhost
       KC_FEATURES: preview
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin

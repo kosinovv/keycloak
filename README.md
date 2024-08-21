@@ -1,4 +1,7 @@
 <h1 style="text-align: center;">Курсовая работа - Сервис аутентификации на KeyCloak</h1>
+
+[![versionspringboot](https://img.shields.io/badge/springboot-3.3.2-brightgreen.svg)](https://github.com/spring-projects/spring-boot)
+
 Разработчик: Косинов Виктор, версия: 1.4
 
 Приложение демонстрирует работу IDM KeyCloak
@@ -18,7 +21,6 @@
 
 - запустить docker-compose.yaml и проверить, что в Docker поднялся контейнер kosinov-keycloak и в нем образы keycloak и postgres_k
 - авторизоваться под admin/admin на сервисе Keycloak http://localhost:8080
-- создать новый realm и импортировать из файла src/main/resources/keycloak/kosinov-keycloak-realm.json
 - завести административного пользователя в realm Kosinov Keycloak с ролью ADMIN, либо включить в группу Administrators
 - запустить приложение KosinovKeycloakApplication.java
 - в браузере открыть адрес http://localhost:8081
@@ -26,7 +28,9 @@
 - проверить функционал приложения:
   - ограничение доступа к страницам согласно ролям ADMIN и USER
   - создание нового пользователя под пользователем с ролью администратора
-  - изменение собственного пользователя для всех авторизованных пользователей
+  - изменение данных пользователя под пользователем с ролью администратора 
+  - удаление пользователя под пользователем с ролью администратора
+  - изменение собственного пароля для всех авторизованных пользователей
 
 # История изменений
 
