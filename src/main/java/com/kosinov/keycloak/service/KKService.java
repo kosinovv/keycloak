@@ -82,11 +82,15 @@ public class KKService {
 
     public void deleteUser(UserDTO userDTO) {
         log.info(String.format("KKService deleteUser: %s",userDTO.getUserName()));
-        RealmResource realmResource = keycloak.realm(realm);
-        List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
-        UserResource userResource = realmResource.users().get(users.get(0).getId());
-        userResource.remove();
-        log.info(String.format("KKService пользователь %s удален",userDTO.getUserName()));
+        if (userDTO.getUserName() != null && !userDTO.getUserName().equals("")) {
+            RealmResource realmResource = keycloak.realm(realm);
+            List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
+            UserResource userResource = realmResource.users().get(users.get(0).getId());
+            userResource.remove();
+            log.info(String.format("KKService пользователь %s удален", userDTO.getUserName()));
+        } else {
+            log.error("KKService не указано имя пользователя для поиска");
+        }
     }
 
     public List<String> listUser() {
@@ -101,19 +105,24 @@ public class KKService {
     }
 
     public UserDTO findUser(String userName) {
-        log.info(String.format("KKService findUser: %s",userName));
-        RealmResource realmResource = keycloak.realm(realm);
-        List<UserRepresentation> users = realmResource.users().search(userName);
         UserDTO user = new UserDTO();
-        user.setUserName(users.get(0).getUsername());
-        user.setFirstName(users.get(0).getFirstName());
-        user.setLastName(users.get(0).getLastName());
-        user.setEmail(users.get(0).getEmail());
-        if (user.getUserName() != null) {
-            log.info(String.format("KKService пользователь %s найден", userName));
+        if (userName != null && !userName.equals("")) {
+            log.info(String.format("KKService findUser: %s", userName));
+            RealmResource realmResource = keycloak.realm(realm);
+            List<UserRepresentation> users = realmResource.users().search(userName);
+            user.setUserName(users.get(0).getUsername());
+            user.setFirstName(users.get(0).getFirstName());
+            user.setLastName(users.get(0).getLastName());
+            user.setEmail(users.get(0).getEmail());
+            if (user.getUserName() != null) {
+                log.info(String.format("KKService пользователь %s найден", userName));
+            }
+        } else {
+            log.error("KKService не указано имя пользователя для поиска");
         }
         return user;
     }
+
 
     public void saveUser(UserDTO userDTO) {
       try {
@@ -126,7 +135,7 @@ public class KKService {
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         userResource.update(user);
-        log.info(String.format("KKService даннык пользователя %s обновлены",userDTO.getUserName()));
+        log.info(String.format("KKService данные пользователя %s обновлены",userDTO.getUserName()));
       } catch (Exception exception) {
         log.error(exception.getMessage());
       }

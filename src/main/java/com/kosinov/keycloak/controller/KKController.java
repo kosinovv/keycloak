@@ -49,7 +49,12 @@ public class KKController {
     @PostMapping("/delete")
     @RolesAllowed("ADMIN")
     public String delete(UserDTO userDTO) {
-        kkService.deleteUser(userDTO);
+        if (userDTO.getUserName() != null && !userDTO.getUserName().equals("")) {
+            kkService.deleteUser(userDTO);
+            return "index";
+        } else {
+            log.error("KKService не выбран пользователь для удаления");
+        }
         return "index";
     }
 
@@ -80,10 +85,15 @@ public class KKController {
 
     @PostMapping("/edit")
     public String edit(UserDTO userDTO, Model model) {
-        log.info("KKController переход на страницу изменения данных пользователя");
-        UserDTO user = kkService.findUser(userDTO.getUserName());
-        model.addAttribute("userEditDTO", user);
-        return "edit-user";
+        if (userDTO.getUserName() != null && !userDTO.getUserName().equals("")) {
+            log.info("KKController переход на страницу изменения данных пользователя");
+            UserDTO user = kkService.findUser(userDTO.getUserName());
+            model.addAttribute("userEditDTO", user);
+            return "edit-user";
+        } else {
+            log.error("KKService не выбран пользователь для редактирования");
+            return "index";
+        }
     }
 
     @PostMapping("/saveEdit")
