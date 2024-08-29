@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Изменение данных пользователя</title>
+</head>
+<body>
+<h1>Изменение данных пользователя <span th:text="${username}"></span></h1>
+<form id="userForm" th:object="${userEditDTO}" th:action="@{/saveEdit}" method="post">
+  <input type="hidden" id="username" name="username" th:value="*{userName}" th:field="*{userName}">
+  <label for="firstname">Имя:</label>
+  <input type="text" id="firstname" name="firstname" th:value="*{firstName}" th:field="*{firstName}" required>
+  <br>
+  <br>
+  <label for="lastname">Фамилия:</label>
+  <input type="text" id="lastname" name="lastname" th:value="*{lastName}" th:field="*{lastName}" required>
+  <br>
+  <br>
+  <label for="email">email:</label>
+  <input type="text" id="email" name="email" th:value="*{email}" th:field="*{email}" required>
+  <br>
+  <br>
+  <button type="submit">Сохранить изменения</button>
+</form>
+<p><a href="index.html" th:href="@{~/}">
+  <button>Назад</button>
+</a></p>
+</body>
+</html>

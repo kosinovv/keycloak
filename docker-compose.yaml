@@ -1,31 +1,18 @@
 version: '3.8'
 services:
-  #app:
-  #  build:
-  #    context: .
-  #    dockerfile: DockerfileApp
-  #  container_name: kosinov_keycloak
-  #  ports:
-  #    - 8081:8081
-  #  depends_on:
-  #    - keycloak
-  #  environment:
-  #    KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
-  #    SPRING_KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
-  #    SPRING_SECURITY_OAUTH2_PROVIDER_KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/kosinov-keycloak-realm
-  #    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/kosinov-keycloak-realm
   keycloak:
     build:
       context: .
       dockerfile: DockerfileKeycloak
     container_name: keycloak
     command:
-      - start
+      - start-dev
       - --http-enabled=true
       - --health-enabled=true
       - --import-realm
       - --db=postgres
     environment:
+      KC_HOSTNAME: localhost
       KC_FEATURES: preview
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin

@@ -1,13 +1,13 @@
 package com.kosinov.keycloak.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.kosinov.keycloak.dto.PasswordDTO;
 import com.kosinov.keycloak.dto.UserDTO;
-import com.kosinov.keycloak.dto.UserDeleteDTO;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
@@ -19,6 +19,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KKService {
@@ -29,6 +30,7 @@ public class KKService {
     private String realm;
 
     public void addUser(UserDTO userDTO) {
+        log.info(String.format("KKService addUser: %s",userDTO.getUserName()));
         CredentialRepresentation credential = createPasswordCredentials(userDTO.getPassword());
         UserRepresentation user = new UserRepresentation();
         user.setUsername(userDTO.getUserName());
@@ -43,6 +45,7 @@ public class KKService {
             addRealmRoleToUser(userDTO.getUserName(), userDTO.getRole());
         }
         org.keycloak.admin.client.CreatedResponseUtil.getCreatedId(response);
+        log.info(String.format("KKService пользователь %s добавлен",userDTO.getUserName()));
     }
 
     private void addRealmRoleToUser(String userName, String roleName) {
@@ -67,19 +70,75 @@ public class KKService {
         return passwordCredentials;
     }
 
-    public void changePassword(PasswordDTO passwordDTO) {
+    public void changePassword(UserDTO userDTO) {
+        log.info(String.format("KKService changePassword для пользователя %s",userDTO.getUserName()));
         RealmResource realmResource = keycloak.realm(realm);
-        List<UserRepresentation> users = realmResource.users().search(passwordDTO.getUserName());
+        List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
         UserResource userResource = realmResource.users().get(users.get(0).getId());
-        CredentialRepresentation credential = createPasswordCredentials(passwordDTO.getPassword());
+        CredentialRepresentation credential = createPasswordCredentials(userDTO.getPassword());
         userResource.resetPassword(credential);
+        log.info(("KKService пароль изменен"));
     }
 
-    public void deleteUser(UserDeleteDTO userDeleteDTO) {
+    public void deleteUser(UserDTO userDTO) {
+        log.info(String.format("KKService deleteUser: %s",userDTO.getUserName()));
+        if (userDTO.getUserName() != null && !userDTO.getUserName().equals("")) {
+            RealmResource realmResource = keycloak.realm(realm);
+            List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
+            UserResource userResource = realmResource.users().get(users.get(0).getId());
+            userResource.remove();
+            log.info(String.format("KKService пользователь %s удален", userDTO.getUserName()));
+        } else {
+            log.error("KKService не указано имя пользователя для поиска");
+        }
+    }
+
+    public List<String> listUser() {
+        log.info("KKService listUser");
         RealmResource realmResource = keycloak.realm(realm);
-        List<UserRepresentation> users = realmResource.users().search(userDeleteDTO.getUserName());
+        List<UserRepresentation> users = realmResource.users().list();
+        List<String> usersList = new ArrayList<>();
+        for(UserRepresentation user : users){
+            usersList.add(user.getUsername());
+        }
+        return usersList;
+    }
+
+    public UserDTO findUser(String userName) {
+        UserDTO user = new UserDTO();
+        if (userName != null && !userName.equals("")) {
+            log.info(String.format("KKService findUser: %s", userName));
+            RealmResource realmResource = keycloak.realm(realm);
+            List<UserRepresentation> users = realmResource.users().search(userName);
+            user.setUserName(users.get(0).getUsername());
+            user.setFirstName(users.get(0).getFirstName());
+            user.setLastName(users.get(0).getLastName());
+            user.setEmail(users.get(0).getEmail());
+            if (user.getUserName() != null) {
+                log.info(String.format("KKService пользователь %s найден", userName));
+            }
+        } else {
+            log.error("KKService не указано имя пользователя для поиска");
+        }
+        return user;
+    }
+
+
+    public void saveUser(UserDTO userDTO) {
+      try {
+        log.info(String.format("KKService saveUser: %s",userDTO.getUserName()));
+        RealmResource realmResource = keycloak.realm(realm);
+        List<UserRepresentation> users = realmResource.users().search(userDTO.getUserName());
         UserResource userResource = realmResource.users().get(users.get(0).getId());
-        userResource.remove();
+        UserRepresentation user = userResource.toRepresentation();
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        userResource.update(user);
+        log.info(String.format("KKService данные пользователя %s обновлены",userDTO.getUserName()));
+      } catch (Exception exception) {
+        log.error(exception.getMessage());
+      }
     }
 
 }
