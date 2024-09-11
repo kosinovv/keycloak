@@ -98,7 +98,7 @@ public class SecurityConfig {
                     mappedAuthorities.addAll(generateAuthoritiesFromClaim(roles));
                 } else if (userInfo.hasClaim(GROUPS)) {
                     Collection<String> roles = (Collection<String>) userInfo.getClaim(GROUPS);
-                    log.info(String.format("User groups: %s",roles.toString()));
+                    log.info(String.format("User roles: %s",roles.toString()));
                     mappedAuthorities.addAll(generateAuthoritiesFromClaim(roles));
                 }
             } else {
