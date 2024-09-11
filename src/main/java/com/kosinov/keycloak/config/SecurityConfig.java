@@ -94,11 +94,11 @@ public class SecurityConfig {
                 if (userInfo.hasClaim(REALM_ACCESS_CLAIM)) {
                     var realmAccess = userInfo.getClaimAsMap(REALM_ACCESS_CLAIM);
                     var roles = (Collection<String>) realmAccess.get(ROLES_CLAIM);
-                    log.info("claim:"+roles.toString());
+                    log.info(String.format("User roles: %s",roles.toString()));
                     mappedAuthorities.addAll(generateAuthoritiesFromClaim(roles));
                 } else if (userInfo.hasClaim(GROUPS)) {
                     Collection<String> roles = (Collection<String>) userInfo.getClaim(GROUPS);
-                    log.info("groups:"+roles.toString());
+                    log.info(String.format("User groups: %s",roles.toString()));
                     mappedAuthorities.addAll(generateAuthoritiesFromClaim(roles));
                 }
             } else {
@@ -108,7 +108,7 @@ public class SecurityConfig {
                 if (userAttributes.containsKey(REALM_ACCESS_CLAIM)) {
                     Map<String, Object> realmAccess = (Map<String, Object>) userAttributes.get(REALM_ACCESS_CLAIM);
                     Collection<String> roles = (Collection<String>) realmAccess.get(ROLES_CLAIM);
-                    log.info("access claim:"+roles.toString());
+                    log.info(String.format("User roles: %s",roles.toString()));
                     mappedAuthorities.addAll(generateAuthoritiesFromClaim(roles));
                 }
             }
